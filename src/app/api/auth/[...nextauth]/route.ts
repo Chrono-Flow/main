@@ -6,8 +6,8 @@ import { prisma } from "@/lib/prisma"
 const handler = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      clientId: process.env.GOOGLE_ID ?? '',
+      clientSecret: process.env.GOOGLE_SECRET ?? '',
     }),
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
@@ -23,17 +23,13 @@ const handler = NextAuth({
       var UserExists = false
       try {
         // Check if user exists
-        const existingUser = await prisma.user.findUnique({
+        var existingUser = await prisma.user.findUnique({
           where: { email: user.email }
         })
 
-        if (existingUser) {
-          UserExists = true
-        }
-
         if (!existingUser) {
           // Create new user if they don't exist
-          const newUser = await prisma.user.create({
+          existingUser = await prisma.user.create({
             data: {
               email: user.email,
               name: user.name,
@@ -41,11 +37,13 @@ const handler = NextAuth({
             }
           })
 
-          if (newUser) {
+
+          if (existingUser.email) {
             UserExists = true
           }
-
         }
+
+        // If user exists, return true
         return UserExists
       } catch (error) {
         console.error("Error checking/creating user:", error)

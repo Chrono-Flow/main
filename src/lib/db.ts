@@ -7,12 +7,15 @@ export async function getUserProjects(userId: string) {
     })
 }
 
-export async function createProject(userId: string, data: { name: string; description?: string; image?: string }) {
-
+export async function createProject(userId: string, data: { name: string; description: string; image?: string }) {
     return await prisma.project.create({
         data: {
             ...data,
-            userId
+            userId,
+            description: data.description || '',
+            type: "SCHEDULE",
+            nodes: [],
+            edges: []
         }
     })
 }

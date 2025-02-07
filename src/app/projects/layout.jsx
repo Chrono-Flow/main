@@ -1,9 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState } from 'react'
-
-// Create context for project navigation
-export const ProjectContext = createContext()
+import { ProjectContext } from '@/context/LoadingContext'
 
 export default function ProjectLayout({ children }) {
     const [currentProject, setCurrentProject] = useState(null)

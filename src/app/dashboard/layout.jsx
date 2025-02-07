@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { LoadingProvider } from '@/context/LoadingContext';
 
 export default function DashboardLayout({ children }) {
     const { data: session, status } = useSession();
@@ -15,8 +16,6 @@ export default function DashboardLayout({ children }) {
                     <div className="w-3 h-3 rounded-full bg-pink-500 animate-bounce"></div>
                 </div>
             </div>
-
-
         </div>;
     }
 
@@ -25,8 +24,11 @@ export default function DashboardLayout({ children }) {
     }
 
     return (
-        <div>
-            {children}
-        </div>
+        <LoadingProvider>
+            <div>
+                <title>Dashboard</title>
+                {children}
+            </div>
+        </LoadingProvider>
     );
 }

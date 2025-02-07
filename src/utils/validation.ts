@@ -48,8 +48,8 @@ export const validateProject = (data: any): ProjectData => {
         name: data.name.trim(),
         description: data.description.trim(),
         image: data.image || '/default-project.png',
-        type: data.type || 'SCHEDULE',
-        scheduleConfig: data.type === 'SCHEDULE' ? {
+        type: data.type || 'schedule',
+        scheduleConfig: data.type === 'schedule' ? {
             schedule: data.scheduleConfig?.schedule || '* * * * *',
             timezone: data.scheduleConfig?.timezone || 'UTC',
             enabled: data.scheduleConfig?.enabled ?? true

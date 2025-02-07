@@ -1,12 +1,15 @@
 "use client"
 
 import { useSession, signOut } from "next-auth/react"
-import { useState, useCallback, useEffect } from "react"
-import ReactFlow, { Background, Controls, Handle, Position } from 'reactflow'
+import { useState, useCallback, useEffect, useMemo } from "react"
+import ReactFlow, { Background, Controls, Handle, Position, applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useRouter } from 'next/navigation'
 import NewProjectModal from '@/components/NewProjectModal'
-
+import { useLoading } from '@/context/LoadingContext'
+import LoadingStatus from '@/components/LoadingStatus'
+import AddNodeModal from '@/components/AddNodeModal'
+import debounce from 'lodash/debounce'
 const initialNodes = [
 	{
 		id: '1',
@@ -64,23 +67,64 @@ const initialEdges = [
 	},
 ];
 
-// Command menu items
-const commands = [
-	{ id: 'new-project', name: 'New Project', description: 'Create a new project', icon: '📑', action: () => console.log('New project') },
-	{ id: 'share', name: 'Share Workspace', description: 'Share current workspace', icon: '🔗', action: () => navigator.clipboard.writeText(window.location.href) },
-	{ id: 'export', name: 'Export Workflow', description: 'Export current workflow', icon: '📤', action: () => console.log('Export') },
-	{ id: 'settings', name: 'Open Settings', description: 'Open workspace settings', icon: '⚙️', action: () => console.log('Settings') },
-	{ id: 'help', name: 'Help & Documentation', description: 'View documentation', icon: '❓', action: () => console.log('Help') },
-	{ id: 'signout', name: 'Sign Out', description: 'Sign out of your account', icon: '👋', action: () => signOut() },
-]
+const initialScheduleNode = {
+	id: 'schedule-1',
+	type: 'scheduleNode',
+	position: { x: 250, y: 25 },
+	data: {
+		label: 'Schedule',
+		schedule: '* * * * *'
+	},
+	style: {
+		background: '#4F46E5',
+		color: 'white',
+		border: 'none',
+		borderRadius: '8px',
+		padding: '10px 20px',
+	}
+};
 
-// Custom Schedule Node Component
 const ScheduleNode = ({ data }) => {
 	return (
-		<div className="px-4 py-2 shadow-md rounded-md bg-yellow-50 border-2 border-yellow-200 min-w-[150px]">
+		<div className="schedule-node">
+			<Handle type="source" position={Position.Bottom} />
+			<div className="p-2">
+				<div className="font-medium">{data.label}</div>
+				<div className="text-sm text-gray-300">{data.schedule}</div>
+			</div>
+		</div>
+	);
+};
+
+const InputNode = ({ data }) => {
+	return (
+		<div className="input-node">
+			<Handle type="source" position={Position.Bottom} />
+			<div className="p-2">
+				<div className="font-medium">{data.label}</div>
+			</div>
+		</div>
+	);
+};
+
+const OutputNode = ({ data }) => {
+	return (
+		<div className="output-node">
 			<Handle type="target" position={Position.Top} />
-			<div className="font-bold text-sm text-gray-700">{data.label}</div>
-			<div className="text-xs text-gray-500">{data.schedule || 'No schedule set'}</div>
+			<div className="p-2">
+				<div className="font-medium">{data.label}</div>
+			</div>
+		</div>
+	);
+};
+
+const DefaultNode = ({ data }) => {
+	return (
+		<div className="default-node">
+			<Handle type="target" position={Position.Top} />
+			<div className="p-2">
+				<div className="font-medium">{data.label}</div>
+			</div>
 			<Handle type="source" position={Position.Bottom} />
 		</div>
 	);
@@ -88,30 +132,12 @@ const ScheduleNode = ({ data }) => {
 
 const nodeTypes = {
 	scheduleNode: ScheduleNode,
-};
-
-const initialScheduleNode = {
-	id: '1',
-	type: 'scheduleNode',
-	data: {
-		label: 'Schedule Task',
-		schedule: '* * * * *'
-	},
-	position: { x: 250, y: 150 },
-};
+	input: InputNode,
+	output: OutputNode,
+	default: DefaultNode
+}
 
 export default function DashboardPage() {
-
-	// interface Project {
-	// 	id: string | number;
-	// 	name: string;
-	// 	description: string;
-	// 	image?: string;
-	// 	status: string;
-	// 	flowCount: number;
-	// 	updatedAt: string; // ISO date string
-	// }
-
 	const { data: session } = useSession()
 	const [nodes, setNodes] = useState([initialScheduleNode])
 	const [edges, setEdges] = useState(initialEdges)
@@ -125,11 +151,27 @@ export default function DashboardPage() {
 	const [currentProject, setCurrentProject] = useState(null)
 	const [error, setError] = useState(null)
 	const [scheduleConfig, setScheduleConfig] = useState(null)
+	const [showNodeModal, setShowNodeModal] = useState(false)
+	const [isConnecting, setIsConnecting] = useState(false)
+	const [projectId, setProjectId] = useState(null)
 
 	const router = useRouter()
+	const { setIsLoading } = useLoading()
 
 	const MIN_WIDTH = 80  // Reduced from 250 to 80
+
 	const MAX_WIDTH = 600
+
+	const commands = [
+		{ id: 'new-project', name: 'New Project', description: 'Create a new project', icon: '📑', action: () => setShowNewProjectModal(true) },
+		{ id: 'share', name: 'Share Workspace', description: 'Share current workspace', icon: '🔗', action: () => navigator.clipboard.writeText(window.location.href) },
+		{ id: 'export', name: 'Export Workflow', description: 'Export current workflow', icon: '📤', action: () => console.log('Export') },
+		{ id: 'settings', name: 'Open Settings', description: 'Open workspace settings', icon: '⚙️', action: () => console.log('Settings') },
+		{ id: 'help', name: 'Help & Documentation', description: 'View documentation', icon: '❓', action: () => console.log('Help') },
+		{ id: 'signout', name: 'Sign Out', description: 'Sign out of your account', icon: '👋', action: () => signOut() },
+		{ id: 'add-node', name: 'Add Node', description: 'Add a new node to workflow', icon: '➕', action: () => setShowNodeModal(true) },
+		{ id: 'connect-nodes', name: 'Connect Nodes', description: 'Connect existing nodes', icon: '🔗', action: () => setIsConnecting(true) },
+	]
 
 	const startResizing = useCallback((e) => {
 		setIsResizing(true)
@@ -159,7 +201,7 @@ export default function DashboardPage() {
 	}, [resize, stopResizing])
 
 	// Helper function to determine if we should show compact view
-	const isCompactView = sidebarWidth < 200
+	// const isCompactView = sidebarWidth < 200
 
 	// Filter commands based on search query
 	const filteredCommands = commands.filter(command =>
@@ -265,6 +307,7 @@ export default function DashboardPage() {
 
 				if (projectId) {
 					await fetchAndSetProject(projectId)
+					setProjectId(projectId)
 					return
 				}
 
@@ -274,6 +317,7 @@ export default function DashboardPage() {
 					const urlProjectId = path.split('/projects/')[1]
 					if (urlProjectId) {
 						await fetchAndSetProject(urlProjectId)
+						setProjectId(urlProjectId)
 					}
 				}
 			} catch (err) {
@@ -286,6 +330,7 @@ export default function DashboardPage() {
 
 	// Fetch all projects
 	const fetchProjects = async () => {
+		setIsLoading(true)
 		try {
 			const response = await fetch('/api/projects')
 			if (response.ok) {
@@ -294,6 +339,8 @@ export default function DashboardPage() {
 			}
 		} catch (error) {
 			console.error('Error fetching projects:', error)
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
@@ -301,14 +348,15 @@ export default function DashboardPage() {
 		fetchProjects()
 	}, [])
 
-	// Modify NewProjectModal usage to include refresh callback
+	// Add handler for project creation success
 	const handleProjectCreated = () => {
-		fetchProjects()
+		fetchProjects() // Re-fetch projects list
 		setShowNewProjectModal(false)
 	}
 
 	// Update handleProjectClick to use history.replaceState
 	const handleProjectClick = (projectId) => {
+		setIsLoading(true)
 		const project = projects.find(p => p.id === projectId);
 		if (project) {
 			setCurrentProject(project);
@@ -343,6 +391,355 @@ export default function DashboardPage() {
 				`/projects/${projectId}`
 			);
 		}
+		setIsLoading(false)
+	}
+
+	// Add save functionality for schedule config
+	const handleScheduleConfigSave = async () => {
+		if (!currentProject || !scheduleConfig) return;
+
+		try {
+			const response = await fetch(`/api/projects/${currentProject.id}/schedule`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(scheduleConfig)
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to save schedule configuration');
+			}
+
+			// Update the node to reflect the new schedule
+			setNodes(nodes => nodes.map(node =>
+				node.type === 'scheduleNode'
+					? { ...node, data: { ...node.data, schedule: scheduleConfig.schedule } }
+					: node
+			));
+
+		} catch (error) {
+			setError(error.message);
+		}
+	};
+
+	// 1. First, memoize nodeTypes as it has no dependencies on other hooks
+	const nodeTypes = useMemo(() => ({
+		scheduleNode: ScheduleNode,
+		input: InputNode,
+		output: OutputNode,
+		default: DefaultNode
+	}), []);
+
+	// 1. First, memoize the debounced API call
+	const debouncedUpdateNodes = useMemo(
+		() =>
+			debounce(async (updatedNodes, projectId) => {
+				try {
+					const response = await fetch('/api/nodes', {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							projectId,
+							nodes: updatedNodes
+						})
+					});
+
+					if (!response.ok) {
+						throw new Error('Failed to update nodes');
+					}
+				} catch (error) {
+					console.error('Error updating nodes:', error);
+				}
+			}, 1000),
+		[]
+	);
+
+	// 2. Define onNodesChange before using it in flowProps
+	const onNodesChange = useCallback((changes) => {
+		setNodes(prevNodes => {
+			const updatedNodes = applyNodeChanges(changes, prevNodes);
+
+			if (projectId) {
+				debouncedUpdateNodes(updatedNodes, projectId);
+			}
+
+			return updatedNodes;
+		});
+	}, [projectId, debouncedUpdateNodes]);
+
+	// 3. Now we can safely use onNodesChange in flowProps
+	const flowProps = useMemo(() => ({
+		nodes,
+		onNodesChange,
+		nodeTypes,
+		fitView: true,
+	}), [nodes, onNodesChange, nodeTypes]);
+
+	return (
+		<DashboardContent
+			currentProject={currentProject}
+			setCurrentProject={setCurrentProject}
+			flowProps={flowProps}
+		/>
+	);
+}
+
+function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
+	// Move all state and hooks here
+	const { data: session } = useSession();
+	const [nodes, setNodes] = useState([initialScheduleNode]);
+	const [edges, setEdges] = useState(initialEdges);
+	const [sidebarWidth, setSidebarWidth] = useState(320);
+	const [isResizing, setIsResizing] = useState(false);
+	const [showCommandMenu, setShowCommandMenu] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+	const [projects, setProjects] = useState([]);
+	const [error, setError] = useState(null);
+	const [scheduleConfig, setScheduleConfig] = useState(null);
+	const [showNodeModal, setShowNodeModal] = useState(false);
+	const [isConnecting, setIsConnecting] = useState(false);
+	const [projectId, setProjectId] = useState(null);
+
+	const router = useRouter();
+	const { setIsLoading } = useLoading();
+
+	const MIN_WIDTH = 80;  // Reduced from 250 to 80
+
+	const MAX_WIDTH = 600;
+
+	const commands = [
+		{ id: 'new-project', name: 'New Project', description: 'Create a new project', icon: '📑', action: () => setShowNewProjectModal(true) },
+		{ id: 'share', name: 'Share Workspace', description: 'Share current workspace', icon: '🔗', action: () => navigator.clipboard.writeText(window.location.href) },
+		{ id: 'export', name: 'Export Workflow', description: 'Export current workflow', icon: '📤', action: () => console.log('Export') },
+		{ id: 'settings', name: 'Open Settings', description: 'Open workspace settings', icon: '⚙️', action: () => console.log('Settings') },
+		{ id: 'help', name: 'Help & Documentation', description: 'View documentation', icon: '❓', action: () => console.log('Help') },
+		{ id: 'signout', name: 'Sign Out', description: 'Sign out of your account', icon: '👋', action: () => signOut() },
+		{ id: 'add-node', name: 'Add Node', description: 'Add a new node to workflow', icon: '➕', action: () => setShowNodeModal(true) },
+		{ id: 'connect-nodes', name: 'Connect Nodes', description: 'Connect existing nodes', icon: '🔗', action: () => setIsConnecting(true) },
+	];
+
+	const startResizing = useCallback((e) => {
+		setIsResizing(true);
+	}, []);
+
+	const stopResizing = useCallback(() => {
+		setIsResizing(false);
+	}, []);
+
+	const resize = useCallback((e) => {
+		if (isResizing) {
+			const newWidth = e.clientX;
+			if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
+				setSidebarWidth(newWidth);
+			}
+		}
+	}, [isResizing]);
+
+
+	useEffect(() => {
+		window.addEventListener('mousemove', resize);
+		window.addEventListener('mouseup', stopResizing);
+		return () => {
+			window.removeEventListener('mousemove', resize);
+			window.removeEventListener('mouseup', stopResizing);
+		};
+	}, [resize, stopResizing]);
+
+	// Helper function to determine if we should show compact view
+	const isCompactView = sidebarWidth < 200;
+
+	// Filter commands based on search query
+	const filteredCommands = commands.filter(command =>
+		command.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+		command.description.toLowerCase().includes(searchQuery.toLowerCase())
+	);
+
+	// Handle keyboard shortcuts
+	useEffect(() => {
+		const handleKeyDown = (e) => {
+			// Open command menu on Ctrl+P
+			if (e.ctrlKey && e.key === 'p') {
+				e.preventDefault();
+				setShowCommandMenu(true);
+				setSearchQuery('');
+				setSelectedIndex(0);
+			}
+
+			// Handle command menu navigation
+			if (showCommandMenu) {
+				switch (e.key) {
+					case 'ArrowDown':
+						e.preventDefault();
+						setSelectedIndex(prev =>
+							prev < filteredCommands.length - 1 ? prev + 1 : prev
+						);
+						break;
+					case 'ArrowUp':
+						e.preventDefault();
+						setSelectedIndex(prev => prev > 0 ? prev - 1 : prev);
+						break;
+					case 'Enter':
+						e.preventDefault();
+						if (filteredCommands[selectedIndex]) {
+							filteredCommands[selectedIndex].action();
+							setShowCommandMenu(false);
+						}
+						break;
+					case 'Escape':
+						e.preventDefault();
+						setShowCommandMenu(false);
+						break;
+				}
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [showCommandMenu, selectedIndex, filteredCommands]);
+
+	// Add function to delete project
+	const handleDeleteProject = async (projectId) => {
+		try {
+			const response = await fetch(`/api/projects/${projectId}`, {
+				method: 'DELETE',
+			});
+
+			if (response.ok) {
+				// Remove project from local state
+				setProjects(projects.filter(p => p.id !== projectId));
+
+				// If deleted project was current project, reset current project
+				if (currentProject?.id === projectId) {
+					setCurrentProject(null);
+					history.replaceState({}, '', '/dashboard');
+				}
+			} else {
+				console.error('Failed to delete project');
+			}
+		} catch (error) {
+			console.error('Error deleting project:', error);
+		}
+	};
+
+	// Function to fetch and set project
+	const fetchAndSetProject = async (projectId) => {
+		try {
+			const response = await fetch(`/api/projects/${projectId}`);
+			if (!response.ok) {
+				throw new Error('Project not found');
+			}
+			const project = await response.json();
+			setCurrentProject(project);
+			// Update URL without navigation
+			history.replaceState(
+				{ projectId: project.id },
+				'',
+				`/projects/${project.id}`
+			);
+		} catch (err) {
+			setError('Project not found');
+			history.replaceState({}, '', '/dashboard');
+		}
+	};
+
+	// Effect to handle project ID from headers and URL
+	useEffect(() => {
+		const handleProjectId = async () => {
+			try {
+				// Try to get project ID from response headers (set by middleware)
+				const response = await fetch('/api/get-headers');
+				const { projectId } = await response.json();
+
+				if (projectId) {
+					await fetchAndSetProject(projectId);
+					setProjectId(projectId);
+					return;
+				}
+
+				// Fallback: Check if we're on a project URL
+				const path = window.location.pathname;
+				if (path.startsWith('/projects/')) {
+					const urlProjectId = path.split('/projects/')[1];
+					if (urlProjectId) {
+						await fetchAndSetProject(urlProjectId);
+						setProjectId(urlProjectId);
+					}
+				}
+			} catch (err) {
+				console.error('Error handling project ID:', err);
+			}
+		};
+
+		handleProjectId();
+	}, []);
+
+	// Fetch all projects
+	const fetchProjects = async () => {
+		setIsLoading(true);
+		try {
+			const response = await fetch('/api/projects');
+			if (response.ok) {
+				const data = await response.json();
+				setProjects(data);
+			}
+		} catch (error) {
+			console.error('Error fetching projects:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchProjects();
+	}, []);
+
+	// Add handler for project creation success
+	const handleProjectCreated = () => {
+		fetchProjects(); // Re-fetch projects list
+		setShowNewProjectModal(false);
+	};
+
+	// Update handleProjectClick to use history.replaceState
+	const handleProjectClick = (projectId) => {
+		setIsLoading(true);
+		const project = projects.find(p => p.id === projectId);
+		if (project) {
+			setCurrentProject(project);
+
+			if (project.type === 'schedule') {
+				if (project.scheduleConfig) {
+					setNodes([{
+						...initialScheduleNode,
+						data: {
+							...initialScheduleNode.data,
+							label: project.name,
+							schedule: project.scheduleConfig.schedule
+						}
+					}]);
+					setScheduleConfig(project.scheduleConfig);
+				} else {
+					setError('Schedule configuration not found for this project');
+					setScheduleConfig({
+						schedule: '* * * * *',
+						timezone: 'UTC',
+						enabled: false
+					});
+				}
+			} else {
+				setNodes(initialNodes);
+				setScheduleConfig(null);
+			}
+
+			history.replaceState(
+				{ projectId },
+				'',
+				`/projects/${projectId}`
+			);
+		}
+		setIsLoading(false);
 	};
 
 	// Add save functionality for schedule config
@@ -413,36 +810,20 @@ export default function DashboardPage() {
 							{currentProject ? currentProject.name : 'Workflow Dashboard'}
 						</h1>
 						<div className="flex items-center gap-4">
-							<button
-								className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
-								onClick={() => navigator.clipboard.writeText(window.location.href)}
-							>
-								Copy URL
-							</button>
-							<button
-								className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
-								onClick={() => signOut()}
-							>
-								Sign Out
-							</button>
-						</div>
-
-						<div>
-
+							<LoadingStatus />
 							<button
 								className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
 								onClick={() => setShowNewProjectModal(true)}
 							>
 								New Project
 							</button>
-
-							<NewProjectModal
-								isOpen={showNewProjectModal}
-								onClose={() => setShowNewProjectModal(false)}
-								onSuccess={handleProjectCreated}
-							/>
+							<button
+								className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+								onClick={() => signOut()}
+							>
+								Sign Out
+							</button>
 						</div>
-
 					</div>
 				</div>
 			</nav>
@@ -555,13 +936,7 @@ export default function DashboardPage() {
 
 				{/* React Flow Workspace */}
 				<div className="flex-1 bg-white border-l-2 border-gray-200">
-					<ReactFlow
-						nodes={nodes}
-						edges={edges}
-						nodeTypes={nodeTypes}
-						fitView
-						className="bg-gradient-to-br from-gray-50 to-gray-100"
-					>
+					<ReactFlow {...flowProps}>
 						<Background color="#94a3b8" gap={16} size={1} />
 						<Controls className="bg-white border border-gray-200 shadow-md rounded-lg" />
 					</ReactFlow>
@@ -694,6 +1069,23 @@ export default function DashboardPage() {
 					</div>
 				</div>
 			)}
+
+			{/* Add modal component */}
+			<NewProjectModal
+				isOpen={showNewProjectModal}
+				onClose={() => setShowNewProjectModal(false)}
+				onSuccess={handleProjectCreated}
+			/>
+
+			{/* Add Node Modal */}
+			<AddNodeModal
+				isOpen={showNodeModal}
+				onClose={() => setShowNodeModal(false)}
+				onAdd={(newNode) => {
+					setNodes((nds) => [...nds, newNode]);
+					onNodesChange([{ type: 'add', item: newNode }]);
+				}}
+			/>
 		</div>
-	)
+	);
 }

@@ -1,37 +1,93 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function DELETE(
-    request: Request,
-    { params }: { params: { projectId: string } }
-) {
+export async function GET(request: NextRequest) {
     try {
-        const session = await getServerSession();
-
-        if (!session?.user?.email) {
-            return NextResponse.json(
-                { message: 'Unauthorized' },
-                { status: 401 }
-            );
+        const session = await getServerSession()
+        if (!session?.user) {
+            return new NextResponse('Unauthorized', { status: 401 })
         }
 
-        // Delete the project
-        await prisma.project.delete({
+        // Get projectId from URL
+        const projectId = request.nextUrl.pathname.split('/projects/')[1]
+
+        const project = await prisma.project.findUnique({
             where: {
-                id: params.projectId,
-                user: {
-                    email: session.user.email
+                id: projectId,
+                userId: session.user.email!
+            }
+        })
+
+        if (!project) {
+            return new NextResponse('Project not found', { status: 404 })
+        }
+
+        return NextResponse.json(project)
+
+    } catch (error) {
+        console.error('Error fetching project:', error)
+        return new NextResponse('Internal Error', { status: 500 })
+    }
+}
+
+export async function PATCH(request: NextRequest) {
+    try {
+        const session = await getServerSession()
+
+        if (!session?.user) {
+            return new NextResponse('Unauthorized', { status: 401 })
+        }
+        const projectId = request.nextUrl.pathname.split('/projects/')[1]
+        const body = await request.json()
+        const { name, description, image } = body
+
+        const project = await prisma.project.update({
+            where: {
+                id: projectId,
+                userId: session.user.email!
+            },
+            data: {
+                name,
+                description,
+                image
+            }
+        })
+
+        return NextResponse.json(project)
+
+    } catch (error) {
+        console.error('Error updating project:', error)
+        return new NextResponse('Internal Error', { status: 500 })
+    }
+}
+
+export async function DELETE(request: NextRequest) {
+    try {
+        const session = await getServerSession()
+        if (!session?.user) {
+            return new NextResponse('Unauthorized', { status: 401 })
+        }
+
+        const projectId = request.nextUrl.pathname.split('/projects/')[1]
+
+        await prisma.user.update({
+            where: {
+                email: session.user.email!
+            },
+            data: {
+                projects: {
+                    delete: {
+                        id: projectId
+                    }
                 }
             }
-        });
+        })
 
-        return NextResponse.json({ message: 'Project deleted successfully' });
+        return new NextResponse('Project deleted', { status: 200 })
+
     } catch (error) {
-        console.error('Failed to delete project:', error);
-        return NextResponse.json(
-            { message: 'Internal server error' },
-            { status: 500 }
-        );
+        console.error('Error deleting project:', error)
+        return new NextResponse('Internal Error', { status: 500 })
     }
 } 

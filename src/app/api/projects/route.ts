@@ -81,13 +81,13 @@ export async function POST(request: Request) {
     }
 }
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
         const session = await getServerSession();
 
         if (!session?.user?.email) {
             return NextResponse.json(
-                { message: 'Unauthorized' },
+                { message: 'Unauthorize`d`' },
                 { status: 401 }
             );
         }

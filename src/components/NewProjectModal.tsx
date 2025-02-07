@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { validateProject } from '@/utils/validation';
 import { useRouter } from 'next/navigation';
 
@@ -25,6 +25,24 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }: NewProje
         }
     });
     const router = useRouter()
+
+    // Add useEffect for ESC key handling
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        if (isOpen) {
+            window.addEventListener('keydown', handleEsc);
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleEsc);
+        };
+    }, [isOpen, onClose]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);

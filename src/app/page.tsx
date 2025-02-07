@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 
 function Header() {
   return (
@@ -8,9 +9,9 @@ function Header() {
         <div className="py-4 border-b border-slate-900/10 lg:px-8 lg:border-0 mx-4 lg:mx-0">
           <div className="relative flex items-center">
             {/* Logo */}
-            <a className="mr-3 flex-none w-[138px] overflow-hidden md:w-auto" href="/">
+            <Link href="/" className="mr-3 flex-none w-[138px] overflow-hidden md:w-auto">
               <span className="text-xl font-bold text-indigo-600">Chron-flow</span>
-            </a>
+            </Link>
             {/* Navigation */}
             <div className="relative hidden lg:flex items-center ml-auto">
               <nav className="text-sm leading-6 font-semibold text-slate-700">
@@ -56,7 +57,7 @@ function TestimonialsSection() {
         <div className="mx-auto mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <figure className="rounded-xl bg-white p-6 shadow-md ring-1 ring-gray-900/5">
             <blockquote className="text-gray-900">
-              <p className="text-sm font-medium leading-6">"Chron-flow has revolutionized how we handle our microservices. The visual workflow builder is a game-changer."</p>
+              <p className="text-sm font-medium leading-6">&quot;The monitoring capabilities have helped us identify and fix issues before they impact our users.&quot;</p>
             </blockquote>
             <figcaption className="mt-6 flex items-center gap-x-4 border-t border-gray-900/10 pt-4">
               <div className="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
@@ -65,21 +66,6 @@ function TestimonialsSection() {
               <div>
                 <div className="text-sm font-semibold">Sarah Brown</div>
                 <div className="text-xs text-gray-600">CTO at TechFlow</div>
-              </div>
-            </figcaption>
-          </figure>
-
-          <figure className="rounded-xl bg-white p-6 shadow-md ring-1 ring-gray-900/5">
-            <blockquote className="text-gray-900">
-              <p className="text-sm font-medium leading-6">"The monitoring capabilities have helped us identify and fix issues before they impact our users."</p>
-            </blockquote>
-            <figcaption className="mt-6 flex items-center gap-x-4 border-t border-gray-900/10 pt-4">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
-                <span className="text-sm font-semibold text-white">JD</span>
-              </div>
-              <div>
-                <div className="text-sm font-semibold">John Doe</div>
-                <div className="text-xs text-gray-600">Lead Developer at StartupX</div>
               </div>
             </figcaption>
           </figure>
