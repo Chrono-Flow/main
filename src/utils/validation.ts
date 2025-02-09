@@ -47,7 +47,7 @@ export const validateProject = (data: any): ProjectData => {
     return {
         name: data.name.trim(),
         description: data.description.trim(),
-        image: data.image || '/default-project.png',
+        image: data.image,
         type: data.type || 'schedule',
         scheduleConfig: data.type === 'schedule' ? {
             schedule: data.scheduleConfig?.schedule || '* * * * *',

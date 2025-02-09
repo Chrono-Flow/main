@@ -1,17 +1,22 @@
 import { getToken } from 'next-auth/jwt';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+const getAuthPages = async () => {
+    const authPages = ['/login', '/logs'];
+    return authPages;
+}
 
 export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request });
-    const isAuthPage = request.nextUrl.pathname.startsWith('/login');
+    const isAuthPage = (await getAuthPages()).some(page => request.nextUrl.pathname.startsWith(page));
     const isProjectPage = request.nextUrl.pathname.startsWith('/projects/');
 
     if (isAuthPage) {
         if (token) {
             return NextResponse.redirect(new URL('/dashboard', request.url));
+        } else {
+            return NextResponse.redirect(new URL('/login', request.url));
         }
-        return NextResponse.next();
     }
 
     if (!token && (request.nextUrl.pathname.startsWith('/dashboard') || isProjectPage)) {
@@ -36,5 +41,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/login', '/projects/:path*']
+    matcher: ['/dashboard/:path*', '/login', '/projects/:path*', '/logs', '/:path*']
 };

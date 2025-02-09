@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { validateProject, ValidationError } from '@/utils/validation';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
+import type { NextRequest } from 'next/server'
+import { ipAddress } from '@vercel/functions';
+import { CreateLog } from '@/app/log';
 
 const initialReadmeNode = {
     id: 'readme',
@@ -23,7 +26,7 @@ const initialScheduleNode = {
     position: { x: 250, y: 150 },
 };
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession();
 
@@ -37,6 +40,7 @@ export async function POST(request: Request) {
         const d = await request.json();
         const { name, description, image, type, scheduleConfig } = validateProject(d);
         const userId = session.user.email as string;
+        const userName = session.user.name as string;
 
         const project = await prisma.user.update({
             where: {
@@ -47,7 +51,7 @@ export async function POST(request: Request) {
                     create: {
                         name,
                         description,
-                        image,
+                        image: image || 'https://picsum.photos/300',
                         type: "SCHEDULE",
                         scheduleConfig: {
                             create: {
@@ -57,12 +61,22 @@ export async function POST(request: Request) {
                             }
                         }
                     }
-                }
+                },
             },
             include: {
                 projects: true,
             }
         });
+
+        CreateLog(`Project ${name} created by ${userName}`, "INFO", userId, request, "CREATE", request.headers.get('user-agent') || "Unknown")
+        // await prisma.logs.create({
+        //     data: {
+        //         userId,
+        //         message: `Project ${name} created by ${userName}`,
+        //         level: 'INFO'
+        //     }
+        // });
+
 
         return NextResponse.json(project, { status: 201 });
     } catch (error) {

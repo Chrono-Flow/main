@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider from "next-auth/providers/github"
 import { prisma } from "@/lib/prisma"
+import { CreateLog } from "@/app/log"
 
 const handler = NextAuth({
   providers: [
@@ -20,7 +21,6 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       if (!user.email) return false
-      var UserExists = false
       try {
         // Check if user exists
         var existingUser = await prisma.user.findUnique({
@@ -37,14 +37,15 @@ const handler = NextAuth({
             }
           })
 
+          CreateLog("User Created at chronoflow", "INFO", user.email)
 
-          if (existingUser.email) {
-            UserExists = true
-          }
+        } else {
+
+          CreateLog("User signed in", "INFO", user.email)
         }
 
         // If user exists, return true
-        return UserExists
+        return true
       } catch (error) {
         console.error("Error checking/creating user:", error)
         return false

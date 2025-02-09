@@ -1,4 +1,6 @@
+import { CreateLog } from '@/app/log'
 import { prisma } from '@/lib/prisma'
+import { ipAddress } from '@vercel/functions'
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -84,6 +86,7 @@ export async function DELETE(request: NextRequest) {
             }
         })
 
+        CreateLog(`Project ${projectId} deleted by ${session.user.email}`, "WARN", session.user.email!, request, "DELETE", request.headers.get('user-agent') || "Unknown")
         return new NextResponse('Project deleted', { status: 200 })
 
     } catch (error) {

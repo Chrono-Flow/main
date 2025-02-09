@@ -10,6 +10,9 @@ import { useLoading } from '@/context/LoadingContext'
 import LoadingStatus from '@/components/LoadingStatus'
 import AddNodeModal from '@/components/AddNodeModal'
 import debounce from 'lodash/debounce'
+import Link from "next/link"
+import { MorphingText } from "@/components/morph-Text"
+import Image from "next/image"
 const initialNodes = [
 	{
 		id: '1',
@@ -519,6 +522,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 		{ id: 'signout', name: 'Sign Out', description: 'Sign out of your account', icon: '👋', action: () => signOut() },
 		{ id: 'add-node', name: 'Add Node', description: 'Add a new node to workflow', icon: '➕', action: () => setShowNodeModal(true) },
 		{ id: 'connect-nodes', name: 'Connect Nodes', description: 'Connect existing nodes', icon: '🔗', action: () => setIsConnecting(true) },
+		{ id: 'user', name: 'User Page', description: 'View user profile', icon: '🧑‍💻', action: () => router.push('/dashboard/user') },
 	];
 
 	const startResizing = useCallback((e) => {
@@ -806,10 +810,16 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 			<nav className="bg-white border-b border-gray-200 shadow-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center h-16">
-						<h1 className="text-xl font-bold text-gray-900">
-							{currentProject ? currentProject.name : 'Workflow Dashboard'}
-						</h1>
 						<div className="flex items-center gap-4">
+							<h1 className="text-lg text-gray-900">
+								<div className="text-sm text-gray-500">Chronoflow</div>
+								{currentProject ? currentProject.name : 'Workflow Dashboard'}
+							</h1>
+						</div>
+						<div className="flex items-center gap-4">
+							<Link href="/dashboard/logs" target="_blank" className=" text-sm font-medium text-green-500">
+								Logs
+							</Link>
 							<LoadingStatus />
 							<button
 								className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
@@ -818,10 +828,19 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 								New Project
 							</button>
 							<button
-								className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+								className="px-4 py-2 text-sm flex gap-x-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-2xl shadow-sm hover:bg-gray-50"
+								onClick={() => router.push('/dashboard/user')}
+							>
+								User 🧑‍💻
+							</button>
+
+
+
+							<button
+								className="px-4 py-2 text-sm flex gap-x-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
 								onClick={() => signOut()}
 							>
-								Sign Out
+								Sign Out 🔑
 							</button>
 						</div>
 					</div>
@@ -935,13 +954,23 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 				</div>
 
 				{/* React Flow Workspace */}
-				<div className="flex-1 bg-white border-l-2 border-gray-200">
-					<ReactFlow {...flowProps}>
-						<Background color="#94a3b8" gap={16} size={1} />
-						<Controls className="bg-white border border-gray-200 shadow-md rounded-lg" />
-					</ReactFlow>
-				</div>
-
+				{
+					currentProject ? (
+						<div className="flex-1 bg-white border-l-2 border-gray-200">
+							<ReactFlow {...flowProps}>
+								<Background color="#94a3b8" gap={16} size={1} />
+								<Controls className="bg-white border border-gray-200 shadow-md rounded-lg" />
+							</ReactFlow>
+						</div>
+					) : (
+						<div className="flex-1 bg-white border-l-2 border-gray-200">
+							<div className="flex flex-col gap-y-4 justify-center items-center h-full">
+								<Image src="/empty.jpg" alt="Empty State" loading="lazy" width={500} height={400} className="rounded-2xl opacity-80 shadow-lg" draggable={false} title="Empty State" />
+								<p className="text-gray-800 text-center text-sm lg:text-3xl font-extrabold">Seems you have not selected any project yet</p>
+							</div>
+						</div>
+					)
+				}
 				{/* Schedule Config Panel */}
 				{scheduleConfig && (
 					<div className="w-80 border-l border-gray-200 bg-white p-4 overflow-y-auto">

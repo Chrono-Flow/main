@@ -1,1 +1,64 @@
 @import "tailwindcss";
+
+.magic {
+    animation-name: magic;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    background-image: linear-gradient(to right, #6366f1, #3225e9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+}
+
+@keyframes magic {
+    0% {
+        background-image: linear-gradient(to right, #6366f1, #3225e9);
+    }
+
+    50% {
+        background-image: linear-gradient(to right, #9089fc, #6366f1);
+    }
+
+    100% {
+        background-image: linear-gradient(to right, #6366f1, #3225e9);
+    }
+}
+
+@keyframes wave {
+    0% {
+        background-position: 200% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.wave-text {
+    background: linear-gradient(90deg,
+            #4f46e5 0%,
+            #7c3aed 25%,
+            #4f46e5 50%,
+            #7c3aed 75%,
+            #4f46e5 100%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: wave 3s linear infinite;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+:root {
+    --color-1: 240, 60%, 50%;
+    /* Vibrant blue */
+    --color-2: 280, 70%, 60%;
+    /* Purple */
+    --color-3: 320, 80%, 60%;
+    /* Pink */
+    --color-4: 200, 90%, 50%;
+    /* Cyan */
+}

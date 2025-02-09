@@ -386,9 +386,24 @@ function HeroSection() {
       {/* Main content */}
       <div className="mx-auto max-w-7xl py-32 sm:py-48 lg:py-56">
         <div className="text-center relative z-10">
-          <h1 className="text-4xl font-bold tracking-tight text-indigo-600 sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
+          <h1 className="text-4xl font-bold tracking-tight transition-all sm:text-6xl wave-text">
             Chron-flow
           </h1>
+
+          {/* <span className="inline-block text-balance transition-all" style={{ opacity: 1, willChange: "auto", transform: "none" }}>
+            <span className="relative overflow-hidden inline-flex bg-background leading-normal text-4xl font-extrabold">
+              AI Agent SDK
+              <div className="absolute inset-0 pointer-events-none mix-blend-lighten dark:mix-blend-darken">
+                <div className="absolute w-[60vw] h-[60vw] top-[-50%] animate-aurora-1" style={{ backgroundColor: "hsl(var(--color-1))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
+                <div className="absolute w-[60vw] h-[60vw] right-0 top-0 animate-aurora-2" style={{ backgroundColor: "hsl(var(--color-2))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
+                <div className="absolute w-[60vw] h-[60vw] left-0 bottom-0 animate-aurora-3" style={{ backgroundColor: "hsl(var(--color-3))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
+                <div className="absolute w-[60vw] h-[60vw] right-0 bottom-[-50%] animate-aurora-4" style={{ backgroundColor: "hsl(var(--color-4))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
+                <div className="absolute w-[60vw] h-[60vw] animate-aurora-5" style={{ backgroundColor: "hsl(var(--color-5))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
+              </div>
+            </span>
+          </span> */}
+
+
           <p className="mt-6 text-lg leading-8 text-gray-600 relative">
             Simplify your scheduling workflows with visual flowcharts. Build, manage, and monitor your backend services with ease.
           </p>
