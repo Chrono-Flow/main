@@ -14,9 +14,8 @@ export async function middleware(request: NextRequest) {
     if (isAuthPage) {
         if (token) {
             return NextResponse.redirect(new URL('/dashboard', request.url));
-        } else {
-            return NextResponse.redirect(new URL('/login', request.url));
         }
+        return NextResponse.next();
     }
 
     if (!token && (request.nextUrl.pathname.startsWith('/dashboard') || isProjectPage)) {
