@@ -50,7 +50,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }: NewProje
 
         try {
             const validatedData = validateProject(formData);
-
+// console.log({validatedData:JSON.stringify(validatedData)})
             const response = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -142,6 +142,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }: NewProje
                         >
                             <option value="schedule">Schedule</option>
                             <option value="workflow">Workflow</option>
+                            <option value={"backend"}>Backend</option>
                         </select>
                     </div>
 

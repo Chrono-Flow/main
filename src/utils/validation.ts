@@ -15,7 +15,7 @@ interface ProjectData {
     name: string;
     description: string;
     image?: string;
-    type?: 'SCHEDULE' | 'WORKFLOW';
+    type?: 'SCHEDULE' | 'WORKFLOW' | "BACKEND";
     scheduleConfig?: ScheduleConfig;
 }
 
@@ -53,6 +53,6 @@ export const validateProject = (data: any): ProjectData => {
             schedule: data.scheduleConfig?.schedule || '* * * * *',
             timezone: data.scheduleConfig?.timezone || 'UTC',
             enabled: data.scheduleConfig?.enabled ?? true
-        } : undefined
+        } : undefined,
     };
 }; 

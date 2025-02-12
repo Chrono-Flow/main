@@ -13,62 +13,65 @@ import debounce from 'lodash/debounce'
 import Link from "next/link"
 import { MorphingText } from "@/components/morph-Text"
 import Image from "next/image"
-const initialNodes = [
-	{
-		id: '1',
-		type: 'input',
-		data: { label: 'Start' },
-		position: { x: 250, y: 25 },
-		style: {
-			background: '#4F46E5',
-			color: 'white',
-			border: 'none',
-			borderRadius: '8px',
-			padding: '10px 20px',
-		},
-	},
-	{
-		id: '2',
-		data: { label: 'Process' },
-		position: { x: 250, y: 125 },
-		style: {
-			background: '#fff',
-			border: '1px solid #E2E8F0',
-			borderRadius: '8px',
-			padding: '10px 20px',
-		},
-	},
-	{
-		id: '3',
-		type: 'output',
-		data: { label: 'End' },
-		position: { x: 250, y: 225 },
-		style: {
-			background: '#DC2626',
-			color: 'white',
-			border: 'none',
-			borderRadius: '8px',
-			padding: '10px 20px',
-		},
-	},
-];
+import { useToast } from "@/components/ui/Toast/ToastContext"
 
-const initialEdges = [
-	{
-		id: 'e1-2',
-		source: '1',
-		target: '2',
-		animated: true,
-		style: { stroke: '#94A3B8' },
-	},
-	{
-		id: 'e2-3',
-		source: '2',
-		target: '3',
-		animated: true,
-		style: { stroke: '#94A3B8' },
-	},
-];
+
+// const initialNodes = [
+// 	{
+// 		id: '1',
+// 		type: 'input',
+// 		data: { label: 'Start' },
+// 		position: { x: 250, y: 25 },
+// 		style: {
+// 			background: '#4F46E5',
+// 			color: 'white',
+// 			border: 'none',
+// 			borderRadius: '8px',
+// 			padding: '10px 20px',
+// 		},
+// 	},
+// 	{
+// 		id: '2',
+// 		data: { label: 'Process' },
+// 		position: { x: 250, y: 125 },
+// 		style: {
+// 			background: '#fff',
+// 			border: '1px solid #E2E8F0',
+// 			borderRadius: '8px',
+// 			padding: '10px 20px',
+// 		},
+// 	},
+// 	{
+// 		id: '3',
+// 		type: 'output',
+// 		data: { label: 'End' },
+// 		position: { x: 250, y: 225 },
+// 		style: {
+// 			background: '#DC2626',
+// 			color: 'white',
+// 			border: 'none',
+// 			borderRadius: '8px',
+// 			padding: '10px 20px',
+// 		},
+// 	},
+// ];
+
+// const initialEdges = [
+// 	{
+// 		id: 'e1-2',
+// 		source: '1',
+// 		target: '2',
+// 		animated: true,
+// 		style: { stroke: '#94A3B8' },
+// 	},
+// 	{
+// 		id: 'e2-3',
+// 		source: '2',
+// 		target: '3',
+// 		animated: true,
+// 		style: { stroke: '#94A3B8' },
+// 	},
+// ];
 
 const initialScheduleNode = {
 	id: 'schedule-1',
@@ -133,17 +136,8 @@ const DefaultNode = ({ data }) => {
 	);
 };
 
-const nodeTypes = {
-	scheduleNode: ScheduleNode,
-	input: InputNode,
-	output: OutputNode,
-	default: DefaultNode
-}
-
 export default function DashboardPage() {
 	const { data: session } = useSession()
-	const [nodes, setNodes] = useState([initialScheduleNode])
-	const [edges, setEdges] = useState(initialEdges)
 	const [sidebarWidth, setSidebarWidth] = useState(320)
 	const [isResizing, setIsResizing] = useState(false)
 	const [showCommandMenu, setShowCommandMenu] = useState(false)
@@ -152,6 +146,9 @@ export default function DashboardPage() {
 	const [showNewProjectModal, setShowNewProjectModal] = useState(false)
 	const [projects, setProjects] = useState([])
 	const [currentProject, setCurrentProject] = useState(null)
+
+	const [nodes, setNodes] = useState(currentProject?.nodes || [initialScheduleNode])
+
 	const [error, setError] = useState(null)
 	const [scheduleConfig, setScheduleConfig] = useState(null)
 	const [showNodeModal, setShowNodeModal] = useState(false)
@@ -165,6 +162,7 @@ export default function DashboardPage() {
 
 	const MAX_WIDTH = 600
 
+	const { showToast } = useToast();
 	const commands = [
 		{ id: 'new-project', name: 'New Project', description: 'Create a new project', icon: '📑', action: () => setShowNewProjectModal(true) },
 		{ id: 'share', name: 'Share Workspace', description: 'Share current workspace', icon: '🔗', action: () => navigator.clipboard.writeText(window.location.href) },
@@ -398,9 +396,14 @@ export default function DashboardPage() {
 	}
 
 	// Add save functionality for schedule config
-	const handleScheduleConfigSave = async () => {
-		if (!currentProject || !scheduleConfig) return;
+	const handleScheduleConfigSave = async (scheduleConfig) => {
+		if (!currentProject || !scheduleConfig) {
+			setError('Schedule configuration not found for this project');
+			showToast('Schedule configuration not found for this project', 'error');
+			return;
+		}
 
+		console.log("HANDLE-SCHEDULE-CONFIG",{scheduleConfig})
 		try {
 			const response = await fetch(`/api/projects/${currentProject.id}/schedule`, {
 				method: 'PUT',
@@ -409,7 +412,7 @@ export default function DashboardPage() {
 			});
 
 			if (!response.ok) {
-				throw new Error('Failed to save schedule configuration');
+				showToast('Failed to save schedule configuration', 'info');
 			}
 
 			// Update the node to reflect the new schedule
@@ -420,6 +423,7 @@ export default function DashboardPage() {
 			));
 
 		} catch (error) {
+			showToast('Failed to save schedule configuration', 'info');
 			setError(error.message);
 		}
 	};
@@ -477,22 +481,23 @@ export default function DashboardPage() {
 		onNodesChange,
 		nodeTypes,
 		fitView: true,
-	}), [nodes, onNodesChange, nodeTypes]);
+	}), [nodes, handleScheduleConfigSave, nodeTypes]);
 
 	return (
 		<DashboardContent
 			currentProject={currentProject}
 			setCurrentProject={setCurrentProject}
 			flowProps={flowProps}
+			saveConfig={handleScheduleConfigSave}
+			nodes={nodes}
+			setNodes={setNodes}
 		/>
 	);
 }
 
-function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
+function DashboardContent({ currentProject, setCurrentProject, flowProps, saveConfig, nodes, setNodes }) {
 	// Move all state and hooks here
 	const { data: session } = useSession();
-	const [nodes, setNodes] = useState([initialScheduleNode]);
-	const [edges, setEdges] = useState(initialEdges);
 	const [sidebarWidth, setSidebarWidth] = useState(320);
 	const [isResizing, setIsResizing] = useState(false);
 	const [showCommandMenu, setShowCommandMenu] = useState(false);
@@ -512,7 +517,6 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 	const MIN_WIDTH = 80;  // Reduced from 250 to 80
 
 	const MAX_WIDTH = 600;
-
 	const commands = [
 		{ id: 'new-project', name: 'New Project', description: 'Create a new project', icon: '📑', action: () => setShowNewProjectModal(true) },
 		{ id: 'share', name: 'Share Workspace', description: 'Share current workspace', icon: '🔗', action: () => navigator.clipboard.writeText(window.location.href) },
@@ -541,6 +545,67 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 			}
 		}
 	}, [isResizing]);
+
+
+
+	const initialNodes = [
+		{
+			id: '1',
+			type: 'input',
+			data: { label: 'Start' },
+			position: { x: 250, y: 25 },
+			style: {
+				background: '#4F46E5',
+				color: 'white',
+				border: 'none',
+				borderRadius: '8px',
+				padding: '10px 20px',
+			},
+		},
+		{
+			id: '2',
+			data: { label: 'Process' },
+			position: { x: 250, y: 125 },
+			style: {
+				background: '#fff',
+				border: '1px solid #E2E8F0',
+				borderRadius: '8px',
+				padding: '10px 20px',
+			},
+		},
+		{
+			id: '3',
+			type: 'output',
+			data: { label: 'End' },
+			position: { x: 250, y: 225 },
+			style: {
+				background: '#DC2626',
+				color: 'white',
+				border: 'none',
+				borderRadius: '8px',
+				padding: '10px 20px',
+			},
+		},
+	];
+
+	const initialEdges = [
+		{
+			id: 'e1-2',
+			source: '1',
+			target: '2',
+			animated: true,
+			style: { stroke: '#94A3B8' },
+		},
+		{
+			id: 'e2-3',
+			source: '2',
+			target: '3',
+			animated: true,
+			style: { stroke: '#94A3B8' },
+		},
+	];
+
+
 
 
 	useEffect(() => {
@@ -758,6 +823,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 			});
 
 			if (!response.ok) {
+
 				throw new Error('Failed to save schedule configuration');
 			}
 
@@ -894,10 +960,10 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 											<p className="text-[10px] text-gray-600 truncate mt-0.5">{project.description}</p>
 											<div className="flex items-center gap-1 mt-1">
 												<span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-medium bg-indigo-50 text-indigo-700">
-													{project.status}
+													{project.flowCount} flow
 												</span>
 												<span className="inline-flex items-center px-1 py-0.5 rounded-full text-[8px] font-medium bg-green-50 text-green-700">
-													{project.flowCount} flows
+													{project.type.toLowerCase()}
 												</span>
 											</div>
 										</div>
@@ -1110,9 +1176,10 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps }) {
 			<AddNodeModal
 				isOpen={showNodeModal}
 				onClose={() => setShowNodeModal(false)}
-				onAdd={(newNode) => {
+				onAdd={async (newNode) => {
 					setNodes((nds) => [...nds, newNode]);
-					onNodesChange([{ type: 'add', item: newNode }]);
+					await saveConfig(nodes);
+					// onNodesChange([{ type: 'add', item: newNode }]);
 				}}
 			/>
 		</div>

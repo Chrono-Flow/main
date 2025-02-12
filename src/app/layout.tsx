@@ -2,6 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react';
 import './globals.css';
+import { ToastProvider } from '@/components/ui/Toast/ToastContext';
 
 export default function RootLayout({
   children,
@@ -10,8 +11,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <title>Chrono-Flow</title>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </SessionProvider>
       </body>
     </html>
   );

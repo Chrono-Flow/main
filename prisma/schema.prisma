@@ -5,13 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") 
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    // directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -24,20 +24,20 @@ model User {
     updatedAt     DateTime  @updatedAt
     projects      Project[] // One-to-many relationship with Project
 
-    isDeleted     Boolean   @default(false)
-    logs          Logs[]
+    isDeleted Boolean @default(false)
+    logs      Logs[]
 }
 
-model Logs{
-    id            String    @id @default(cuid())
-    createdAt     DateTime  @default(now())
-    userId        String
-    user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    message       String
-    level         LogLevel
-    ip            String?
-    userAgent     String?
-    action        ActionType?
+model Logs {
+    id        String      @id @default(cuid())
+    createdAt DateTime    @default(now())
+    userId    String
+    user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    message   String
+    level     LogLevel
+    ip        String?
+    userAgent String?
+    action    ActionType?
 }
 
 enum ActionType {
@@ -53,21 +53,33 @@ enum LogLevel {
     ERROR
 }
 
+enum projectType {
+    SCHEDULE
+    BACKEND
+}
+
 model Project {
-    id            String         @id @default(cuid())
-    name          String
-    description   String
-    image         String?
-    type          String        @default("SCHEDULE")
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
-    userId        String
-    user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id          String      @id @default(cuid())
+    name        String
+    description String
+    image       String?
+    type        projectType @default(BACKEND)
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    userId      String
+    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // for schedules
     scheduleConfig ScheduleConfig?
-    nodes         Json[]        @default([])
-    edges         Json[]        @default([])
-    status        String        @default("active")
-    flowCount     Int           @default(0)
+
+    // for backend
+    serverCode  String?
+    visibleCode String?
+
+    nodes     Json[] @default([])
+    edges     Json[] @default([])
+    status    String @default("active")
+    flowCount Int    @default(0)
 }
 
 model ScheduleConfig {

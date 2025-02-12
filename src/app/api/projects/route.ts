@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import type { NextRequest } from 'next/server'
 import { ipAddress } from '@vercel/functions';
 import { CreateLog } from '@/app/log';
+import { projectType } from '@prisma/client';
 
 const initialReadmeNode = {
     id: 'readme',
@@ -41,32 +42,66 @@ export async function POST(request: NextRequest) {
         const { name, description, image, type, scheduleConfig } = validateProject(d);
         const userId = session.user.email as string;
         const userName = session.user.name as string;
+        let t;
+        if (type == "SCHEDULE") {
+            t = projectType.SCHEDULE
+        } else if (type == "BACKEND") {
+            t = projectType.BACKEND
+        }
 
-        const project = await prisma.user.update({
+        // const project = await prisma.user.update({
+        //     where: {
+        //         email: userId
+        //     },
+        //     data: {
+        //         projects: {
+        //             create: {
+        //                 name,
+        //                 description,
+        //                 image: image || 'https://picsum.photos/300',
+        //                 type: t,
+        //                 scheduleConfig: scheduleConfig && {
+        //                     create: {
+        //                         schedule: scheduleConfig?.schedule || '* * * * *',
+        //                         timezone: scheduleConfig?.timezone || 'UTC',
+        //                         enabled: scheduleConfig?.enabled ?? true
+        //                     }
+        //                 },
+        //                 visibleCode:"",
+        //                 serverCode:""
+        //             }
+        //         },
+        //     },
+        //     include: {
+        //         projects: true,
+        //     }
+        // });
+
+        const user = await prisma.user.findUnique({
             where: {
                 email: userId
-            },
+            }
+        })
+
+        const project = await prisma.project.create({
             data: {
-                projects: {
+                name,
+                description,
+                image: image || 'https://picsum.photos/300',
+                type: t,
+                scheduleConfig: scheduleConfig && {
                     create: {
-                        name,
-                        description,
-                        image: image || 'https://picsum.photos/300',
-                        type: "SCHEDULE",
-                        scheduleConfig: {
-                            create: {
-                                schedule: scheduleConfig?.schedule || '* * * * *',
-                                timezone: scheduleConfig?.timezone || 'UTC',
-                                enabled: scheduleConfig?.enabled ?? true
-                            }
-                        }
+                        schedule: scheduleConfig?.schedule || '* * * * *',
+                        timezone: scheduleConfig?.timezone || 'UTC',
+                        enabled: scheduleConfig?.enabled ?? true
                     }
                 },
-            },
-            include: {
-                projects: true,
+                visibleCode: "",
+                serverCode: "",
+                // user : user,
+                userId: user?.email!,
             }
-        });
+        })
 
         CreateLog(`Project ${name} created by ${userName}`, "INFO", userId, request, "CREATE", request.headers.get('user-agent') || "Unknown")
         // await prisma.logs.create({

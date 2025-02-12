@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { realIP } from "@/utils/constants"
 import { ActionType } from "@prisma/client"
 import { ipAddress } from "@vercel/functions"
 import { NextRequest } from "next/server"
@@ -13,7 +14,7 @@ export const CreateLog = async (message: string, level: "INFO" | "WARN" | "ERROR
                 create: {
                     message,
                     level,
-                    ip: request ? (ipAddress(request) || request.headers.get('x-forwarded-for')) : null,
+                    ip: realIP(request!, true) || ipAddress(request!),
                     userAgent,
                     action
                 }
