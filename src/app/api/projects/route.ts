@@ -6,6 +6,8 @@ import type { NextRequest } from 'next/server'
 import { ipAddress } from '@vercel/functions';
 import { CreateLog } from '@/app/log';
 import { projectType } from '@prisma/client';
+import { getToken } from 'next-auth/jwt';
+import { NextApiRequest } from 'next';
 
 const initialReadmeNode = {
     id: 'readme',
@@ -130,20 +132,20 @@ export async function POST(request: NextRequest) {
     }
 }
 
-export async function GET() {
+export async function GET(req: NextApiRequest) {
     try {
-        const session = await getServerSession();
-
-        if (!session?.user?.email) {
+        // const session = await getServerSession();
+        const token = await getToken({ req })
+        if (!token?.email) {
             return NextResponse.json(
-                { message: 'Unauthorize`d`' },
+                { message: 'Unauthorized' },
                 { status: 401 }
             );
         }
 
         const projects = await prisma.user.findUnique({
             where: {
-                email: session.user.email,
+                email: token?.email,
             },
             include: {
                 projects: true

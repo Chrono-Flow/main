@@ -64,12 +64,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                             <div className="flex flex-col justify-center gap-2">
                                 <span className=" font-bold">{toast.type.toUpperCase()}</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="flex-shrink-0 font-bold">{icons[toast.type]}</span>
+                                    <span className="shrink-0 font-bold">{icons[toast.type]}</span>
                                     <p className="flex-1">{toast.message}</p>
 
                                     <button
                                         onClick={() => removeToast(toast.id)}
-                                        className="flex-shrink-0 hover:opacity-70 transition-opacity"
+                                        className="shrink-0 hover:opacity-70 transition-opacity"
                                     >
                                         <X className="w-5 h-5" />
                                     </button>

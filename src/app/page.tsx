@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 bg-white/95 supports-backdrop-blur:bg-white/60">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-sm flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-slate-900/10 bg-white/95 supports-backdrop-blur:bg-white/60">
       <div className="max-w-8xl mx-auto">
         <div className="py-4 border-b border-slate-900/10 lg:px-8 lg:border-0 mx-4 lg:mx-0">
           <div className="relative flex items-center">
@@ -60,7 +60,7 @@ function TestimonialsSection() {
               <p className="text-sm font-medium leading-6">&quot;The monitoring capabilities have helped us identify and fix issues before they impact our users.&quot;</p>
             </blockquote>
             <figcaption className="mt-6 flex items-center gap-x-4 border-t border-gray-900/10 pt-4">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-linear-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
                 <span className="text-sm font-semibold text-white">SB</span>
               </div>
               <div>
@@ -75,7 +75,7 @@ function TestimonialsSection() {
               <p className="text-sm font-medium leading-6">"Setting up complex workflows used to take days. With Chron-flow, we can do it in hours."</p>
             </blockquote>
             <figcaption className="mt-6 flex items-center gap-x-4 border-t border-gray-900/10 pt-4">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-linear-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
                 <span className="text-sm font-semibold text-white">AL</span>
               </div>
               <div>
@@ -90,7 +90,7 @@ function TestimonialsSection() {
               <p className="text-sm font-medium leading-6">"The integration capabilities are incredible. We've connected all our services seamlessly."</p>
             </blockquote>
             <figcaption className="mt-6 flex items-center gap-x-4 border-t border-gray-900/10 pt-4">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-linear-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
                 <span className="text-sm font-semibold text-white">RK</span>
               </div>
               <div>
@@ -151,7 +151,7 @@ function PricingSection() {
                 </li>
               </ul>
             </div>
-            <a href="#" className="mt-8 block rounded-md bg-indigo-600 px-3.5 py-2 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <a href="#" className="mt-8 block rounded-md bg-indigo-600 px-3.5 py-2 text-center text-sm font-semibold leading-6 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Get started for free
             </a>
           </div>
@@ -197,7 +197,7 @@ function PricingSection() {
                 </li>
               </ul>
             </div>
-            <a href="#" className="mt-8 block rounded-md bg-indigo-600 px-3.5 py-2 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <a href="#" className="mt-8 block rounded-md bg-indigo-600 px-3.5 py-2 text-center text-sm font-semibold leading-6 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Get started with Pro
             </a>
           </div>
@@ -239,7 +239,7 @@ function PricingSection() {
                 </li>
               </ul>
             </div>
-            <a href="#" className="mt-8 block rounded-md bg-gray-900 px-3.5 py-2 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">
+            <a href="#" className="mt-8 block rounded-md bg-gray-900 px-3.5 py-2 text-center text-sm font-semibold leading-6 text-white shadow-xs hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">
               Contact sales
             </a>
           </div>
@@ -329,7 +329,7 @@ function HeroSection() {
     <div className="relative isolate px-6 pt-14 lg:px-8">
       {/* Background decorative elements */}
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
-        <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+        <div className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
           style={{
             clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'
           }}
@@ -408,9 +408,9 @@ function HeroSection() {
             Simplify your scheduling workflows with visual flowcharts. Build, manage, and monitor your backend services with ease.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <a href="#" className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 relative overflow-hidden group">
+            <a href="#" className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 relative overflow-hidden group">
               <span className="relative z-10">Get started</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
             <a href="#" className="text-sm font-semibold leading-6 text-gray-900 hover:text-indigo-600 transition-colors px-3.5 py-2.5 border border-gray-200 rounded-md hover:border-indigo-600">
               Learn more <span aria-hidden="true">→</span>
@@ -421,7 +421,7 @@ function HeroSection() {
 
       {/* Bottom decorative element */}
       <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
-        <div className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+        <div className="relative left-[calc(50%+3rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
           style={{
             clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'
           }}
@@ -437,7 +437,7 @@ function CTASection() {
       <div className="mx-auto max-w-7xl py-24 sm:px-6 sm:py-32 lg:px-8">
         <div className="relative isolate px-6 py-24 sm:px-16 sm:rounded-3xl overflow-hidden">
           {/* Subtle gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-gray-100"></div>
+          <div className="absolute inset-0 bg-linear-to-b from-gray-50 to-gray-100"></div>
 
           {/* Decorative elements */}
           <div className="absolute inset-0 opacity-10">
@@ -515,7 +515,7 @@ export default function Home() {
       <HeroSection />
 
       {/* Feature Section */}
-      <div className="bg-gradient-to-b from-white to-indigo-50 py-24 sm:py-32">
+      <div className="bg-linear-to-b from-white to-indigo-50 py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:text-center">
             <h2 className="text-base font-semibold leading-7 text-indigo-600">Deploy faster</h2>

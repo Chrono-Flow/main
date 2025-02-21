@@ -117,7 +117,7 @@ const DecorativeShapes = () => {
       <div className="absolute right-60 bottom-40 w-24 h-24 bg-blue-400 opacity-10 transform -rotate-12"></div>
 
       {/* Gradient blob */}
-      {/* <div className="absolute right-1/4 top-1/3 w-64 h-64 bg-gradient-to-br from-indigo-300 to-purple-300 rounded-full opacity-10 blur-3xl"></div> */}
+      {/* <div className="absolute right-1/4 top-1/3 w-64 h-64 bg-linear-to-br from-indigo-300 to-purple-300 rounded-full opacity-10 blur-3xl"></div> */}
 
       {/* Animated dots */}
       <div className="absolute right-1/3 bottom-1/4 flex gap-2">

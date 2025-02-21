@@ -98,7 +98,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }: NewProje
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                             disabled={loading}
                             required
                         />
@@ -111,7 +111,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }: NewProje
                         <textarea
                             value={formData.description}
                             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                             rows={3}
                             disabled={loading}
                             required
@@ -126,7 +126,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }: NewProje
                             type="url"
                             value={formData.image}
                             onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                             disabled={loading}
                         />
                     </div>

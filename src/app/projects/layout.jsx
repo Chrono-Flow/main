@@ -8,7 +8,7 @@ export default function ProjectLayout({ children }) {
 
     return (
         <ProjectContext.Provider value={{ currentProject, setCurrentProject }}>
-            <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="flex flex-col h-screen bg-linear-to-br from-gray-50 to-gray-100">
                 {/* Reuse the same layout as dashboard */}
                 {children}
             </div>

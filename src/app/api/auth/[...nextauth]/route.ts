@@ -62,6 +62,7 @@ const handler = NextAuth({
           select: { id: true }
         })
 
+
         // Add the database ID to the token
         token.id = dbUser?.id
       }

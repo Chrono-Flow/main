@@ -840,12 +840,12 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 	};
 
 	return (
-		<div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+		<div className="flex flex-col h-screen bg-linear-to-br from-gray-50 to-gray-100">
 			{/* Add error message display */}
 			{error && (
 				<div className="bg-red-50 border-l-4 border-red-400 p-4">
 					<div className="flex">
-						<div className="flex-shrink-0">
+						<div className="shrink-0">
 							<svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
 								<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
 							</svg>
@@ -859,7 +859,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 							<div className="-mx-1.5 -my-1.5">
 								<button
 									onClick={() => setError(null)}
-									className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+									className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
 								>
 									<span className="sr-only">Dismiss</span>
 									<svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -873,7 +873,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 			)}
 
 			{/* Top Navbar */}
-			<nav className="bg-white border-b border-gray-200 shadow-sm">
+			<nav className="bg-white border-b border-gray-200 shadow-xs">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center h-16">
 						<div className="flex items-center gap-4">
@@ -894,7 +894,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 								New Project
 							</button>
 							<button
-								className="px-4 py-2 text-sm flex gap-x-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-2xl shadow-sm hover:bg-gray-50"
+								className="px-4 py-2 text-sm flex gap-x-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-2xl shadow-xs hover:bg-gray-50"
 								onClick={() => router.push('/dashboard/user')}
 							>
 								User 🧑‍💻
@@ -903,7 +903,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 
 
 							<button
-								className="px-4 py-2 text-sm flex gap-x-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+								className="px-4 py-2 text-sm flex gap-x-2 font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-xs hover:bg-gray-50"
 								onClick={() => signOut()}
 							>
 								Sign Out 🔑
@@ -921,7 +921,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 			>
 				{/* Projects Sidebar */}
 				<div
-					className="bg-white border-r-2 border-gray-200 overflow-y-auto flex-shrink-0 md:block hidden transition-all duration-200"
+					className="bg-white border-r-2 border-gray-200 overflow-y-auto shrink-0 md:block hidden transition-all duration-200"
 					style={{ width: sidebarWidth }}
 				>
 					<div className={`${isCompactView ? 'p-2' : 'p-3'}`}>
@@ -935,17 +935,17 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 									onClick={() => handleProjectClick(project.id)}
 									className={`
 										bg-white rounded-xl border border-gray-200 
-										hover:border-indigo-500 hover:shadow-sm 
+										hover:border-indigo-500 hover:shadow-xs 
 										cursor-pointer transition-all duration-200
 										${isCompactView ? 'p-1.5' : 'p-2'}
 										h-[70px] flex items-center gap-3
-										${currentProject?.id === project.id ? 'border-indigo-500 shadow-sm' : ''}
+										${currentProject?.id === project.id ? 'border-indigo-500 shadow-xs' : ''}
 									`}
 									title={isCompactView ? project.name : ''}
 								>
 									{/* Project Image */}
 									<div
-										className="w-12 h-12 rounded-full bg-cover bg-center flex-shrink-0 border border-gray-100"
+										className="w-12 h-12 rounded-full bg-cover bg-center shrink-0 border border-gray-100"
 										style={{ backgroundImage: `url(${project.image || '/default-project-image.png'})` }}
 									/>
 
@@ -953,7 +953,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 										<div className="flex-1 min-w-0">
 											<div className="flex justify-between items-center">
 												<h3 className="font-medium text-xs text-gray-900 truncate">{project.name}</h3>
-												<span className="text-[9px] text-gray-500 flex-shrink-0 ml-2">
+												<span className="text-[9px] text-gray-500 shrink-0 ml-2">
 													{new Date(project.updatedAt).toLocaleDateString()}
 												</span>
 											</div>
@@ -1003,7 +1003,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 
 				{/* Enhanced Resizer */}
 				<div
-					className="relative select-none flex-shrink-0"
+					className="relative select-none shrink-0"
 					onMouseDown={startResizing}
 					style={{ cursor: 'col-resize' }}
 				>
@@ -1089,7 +1089,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 										...prev,
 										enabled: e.target.checked
 									}))}
-									className="h-4 w-4 text-indigo-600 rounded"
+									className="h-4 w-4 text-indigo-600 rounded-sm"
 								/>
 								<label htmlFor="enabled" className="ml-2 text-sm text-gray-700">
 									Enable Schedule
@@ -1112,7 +1112,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 								</svg>
 								<input
 									type="text"
-									className="flex-1 bg-transparent border-0 outline-none text-gray-900 placeholder-gray-400"
+									className="flex-1 bg-transparent border-0 outline-hidden text-gray-900 placeholder-gray-400"
 									placeholder="Search commands..."
 									value={searchQuery}
 									onChange={(e) => {
@@ -1121,7 +1121,7 @@ function DashboardContent({ currentProject, setCurrentProject, flowProps, saveCo
 									}}
 									autoFocus
 								/>
-								<kbd className="hidden sm:inline-block px-2 py-0.5 text-xs text-gray-500 bg-gray-200 rounded">ESC to close</kbd>
+								<kbd className="hidden sm:inline-block px-2 py-0.5 text-xs text-gray-500 bg-gray-200 rounded-sm">ESC to close</kbd>
 							</div>
 						</div>
 

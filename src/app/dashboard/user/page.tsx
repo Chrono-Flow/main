@@ -150,7 +150,7 @@ export default function UserPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="bg-white rounded-lg shadow-sm p-6 mb-6"
+                    className="bg-white rounded-lg shadow-xs p-6 mb-6"
                 >
                     <div className="flex items-center space-x-6">
                         <motion.div
@@ -186,7 +186,7 @@ export default function UserPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                             whileHover={{ scale: 1.02 }}
-                            className="bg-white rounded-lg shadow-sm p-6"
+                            className="bg-white rounded-lg shadow-xs p-6"
                         >
                             <h3 className="text-lg font-semibold text-gray-900">{stat.title}</h3>
                             <p className={`text-3xl font-bold text-${stat.color}-600`}>{stat.value}</p>
@@ -199,7 +199,7 @@ export default function UserPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 }}
-                    className="bg-white rounded-lg shadow-sm p-6 mb-6"
+                    className="bg-white rounded-lg shadow-xs p-6 mb-6"
                 >
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold text-gray-900">Analytics</h2>
@@ -250,7 +250,7 @@ export default function UserPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
-                    className="bg-white rounded-lg shadow-sm p-6"
+                    className="bg-white rounded-lg shadow-xs p-6"
                 >
                     <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Projects</h2>
                     <div className="overflow-x-auto">
