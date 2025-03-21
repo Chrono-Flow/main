@@ -1,0 +1,37 @@
+{
+    "manifest_version": 3,
+    "version": "0.0.1",
+    "author": "Ashish_kumar<15678ashish@gmail.com>",
+    "name": "DEV | new-ex",
+    "description": "a basic extension for helping our agent app",
+    "host_permissions": [
+        "https://*/*"
+    ],
+    "action": {
+        "default_popup": "index.html"
+    },
+    "background": {
+        "service_worker": "service.js"
+    },
+    "permissions": [
+        "tabs",
+        "alarms",
+        "activeTab",
+        "scripting"
+    ],
+    "content-scripts": [
+        {
+            "matches": [
+                "https://www.instagram.com/accounts/login",
+                "https://www.instagram.com",
+                "instagram.com"
+            ],
+            "js": [
+                "index.js"
+            ]
+        }
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' http://localhost;object-src 'self';"
+    }
+}
