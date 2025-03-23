@@ -10,7 +10,7 @@ function Header() {
           <div className="relative flex items-center">
             {/* Logo */}
             <Link href="/" className="mr-3 flex-none w-[138px] overflow-hidden md:w-auto">
-              <span className="text-xl font-bold text-indigo-600">Chron-flow</span>
+              <span className="text-xl font-bold text-indigo-600">Chrono-flow</span>
             </Link>
             {/* Navigation */}
             <div className="relative hidden lg:flex items-center ml-auto">
@@ -125,7 +125,7 @@ function PricingSection() {
                   Most popular
                 </p>
               </div>
-              <p className="mt-4 text-sm leading-6 text-gray-600">Perfect for trying out ChronFlow</p>
+              <p className="mt-4 text-sm leading-6 text-gray-600">Perfect for trying out ChronoFlow</p>
               <p className="mt-6 flex items-baseline gap-x-1">
                 <span className="text-4xl font-bold tracking-tight text-gray-900">$0</span>
                 <span className="text-sm font-semibold leading-6 text-gray-600">/month</span>
@@ -387,12 +387,13 @@ function HeroSection() {
       <div className="mx-auto max-w-7xl py-32 sm:py-48 lg:py-56">
         <div className="text-center relative z-10">
           <h1 className="text-4xl font-bold tracking-tight transition-all sm:text-6xl wave-text">
-            Chron-flow
+            Chrono-flow
           </h1>
 
           {/* <span className="inline-block text-balance transition-all" style={{ opacity: 1, willChange: "auto", transform: "none" }}>
             <span className="relative overflow-hidden inline-flex bg-background leading-normal text-4xl font-extrabold">
               AI Agent SDK
+
               <div className="absolute inset-0 pointer-events-none mix-blend-lighten dark:mix-blend-darken">
                 <div className="absolute w-[60vw] h-[60vw] top-[-50%] animate-aurora-1" style={{ backgroundColor: "hsl(var(--color-1))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
                 <div className="absolute w-[60vw] h-[60vw] right-0 top-0 animate-aurora-2" style={{ backgroundColor: "hsl(var(--color-2))", filter: "blur(1rem)", mixBlendMode: "overlay" }}></div>
@@ -405,7 +406,7 @@ function HeroSection() {
 
 
           <p className="mt-6 text-lg leading-8 text-gray-600 relative">
-            Simplify your scheduling workflows with visual flowcharts. Build, manage, and monitor your backend services with ease.
+            Build, manage, and monitor your backend services with ease , the only platform you'll ever need.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <a href="#" className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 relative overflow-hidden group">

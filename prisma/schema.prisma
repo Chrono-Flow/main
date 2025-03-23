@@ -10,9 +10,20 @@ generator client {
 
 datasource db {
     provider  = "postgresql"
-    url       = env("DATABASE_URL")
+    url       = env("PRISMA_DATABASE_URL")
     // directUrl = env("DIRECT_URL")
 }
+
+model sub {
+  id            String   @id @default(cuid())
+  email String 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  useragent     String
+  ip            String
+  ref           String?
+}
+
 
 model User {
     id            String    @id @default(cuid())
